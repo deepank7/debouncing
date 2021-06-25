@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useCallback } from 'react';
+import debounce from 'lodash.debounce';
 
-function App() {
+export default function App() {
+  const [value, setValue] = useState('');
+  const [dbValue, saveToDb] = useState(''); // would be an API call normally
+
+  const debouncedSave = useCallback(
+    debounce(nextValue => saveToDb(nextValue), 1000),
+    [], // will be created only once initially
+  );
+
+  const handleChange = event => {
+    const nextValue = event.target.value;
+    setValue(nextValue);
+    // const debouncedSave = debounce(() => saveToDb(nextValue), 1000);
+    debouncedSave(nextValue);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      <h1>Blog</h1>
+      <textarea value={value} onChange={handleChange} rows={5} cols={50} />
+      <section className="panels">
+        <div>
+          <h2>Editor (Client)</h2>
+          {value}
+        </div>
+        <div>
+          <h2>Saved (DB)</h2>
+          {dbValue}
+        </div>
+      </section>
+    </main>
   );
 }
-
-export default App;
